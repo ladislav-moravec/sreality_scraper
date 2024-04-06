@@ -1,9 +1,8 @@
 import scrapy
 import json
-from srealityscraper.items import FlatItem
 
 class FlatSpider(scrapy.Spider):
-    name = 'sreality'
+    name = 'sreality_splash'
 
     start_urls = ['https://www.sreality.cz/api/cs/v2/estates?category_main_cb=1&category_type_cb=1&sort=0&per_page=' + str(100) + '&page='+str(x)+''for x in range(1, 6)]
 
