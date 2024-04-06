@@ -32,7 +32,7 @@ def create_table(name_table):
     cur.execute(f"""
     CREATE TABLE IF NOT EXISTS {name_table} (
         id SERIAL PRIMARY KEY,
-        name VARCHAR,
+        title VARCHAR,
         price INTEGER,
         image_urls JSONB
     );
