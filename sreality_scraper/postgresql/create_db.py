@@ -1,7 +1,6 @@
 import psycopg2
 
 def create_database():
-    # Připojení k defaultní databázi PostgreSQL (template1)
     conn = psycopg2.connect(
         dbname="postgres",
         user="postgres",
@@ -11,15 +10,12 @@ def create_database():
     conn.autocommit = True
     cur = conn.cursor()
 
-    # Vytvoření nové databáze s názvem sreality
     cur.execute("CREATE DATABASE master")
 
-    # Uzavření spojení s template1 databází
     cur.close()
     conn.close()
 
 def create_table(name_table):
-    # Připojení k nově vytvořené databázi sreality
     conn = psycopg2.connect(
         dbname="master",
         user="postgres",
@@ -28,20 +24,17 @@ def create_table(name_table):
     )
     cur = conn.cursor()
 
-    # Vytvoření tabulky estates, pokud ještě neexistuje
     cur.execute(f"""
     CREATE TABLE IF NOT EXISTS {name_table} (
         id SERIAL PRIMARY KEY,
         title VARCHAR,
-        price INTEGER,
-        image_urls JSONB
+        price VARCHAR,
+        image_urls TEXT
     );
     """)
 
-    # Potvrzení provedení změn v databázi
     conn.commit()
 
-    # Uzavření spojení
     cur.close()
     conn.close()
 
