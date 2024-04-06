@@ -1,7 +1,7 @@
 import psycopg2
 import json
 
-#test
+
 def put_to_db(title, price, image_urls):
     # Připojení k databázi
     conn = psycopg2.connect(
