@@ -1,0 +1,51 @@
+/* Dark mode theme */
+body {
+    background-color: #333;
+    color: #fff;
+}
+
+/* Table styling */
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+table, th, td {
+    border: 1px solid #666;
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;
+}
+
+/* Images styling */
+img {
+    max-width: 500px;
+    border-radius: 10px; /* Rounded corners */
+    transition: all 0.3s ease; /* Smooth transition */
+}
+
+img:hover {
+    transform: scale(1.01); /* Scale up on hover */
+}
+
+.pagination {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.pagination a {
+    display: inline-block;
+    padding: 8px 12px; /* Adjust padding for spacing */
+    margin: 0 4px; /* Add margin for spacing between page numbers */
+    text-decoration: none;
+    color: #fff;
+    background-color: #808080;
+    border: 1px solid #808080;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.pagination a.current {
+    background-color: #a9a9a9; /* Change background color for

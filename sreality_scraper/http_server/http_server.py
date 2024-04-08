@@ -1,83 +1,141 @@
+import psycopg2
 from http.server import BaseHTTPRequestHandler, HTTPServer
-import json
-
-# Definujeme data
-data = [
-    {"id": 2, "description": "Prodej bytu 4+1 99 m²", "price": "1 980 000 Kč",
-     "images": ["https://sta-reality2.1gr.cz/sta/compile/thumbs/9/1/5/b9cc44adf6ae5495a1e8690408e3e.jpg",
-                "https://sta-reality2.1gr.cz/sta/compile/thumbs/c/e/b/000b0f02d5d2fc214de38fe839725.jpg",
-                "https://sta-reality2.1gr.cz/sta/compile/thumbs/0/a/a/0118ffdb12dc989d446821fa1ec23.jpg",
-                "https://sta-reality2.1gr.cz/sta/compile/thumbs/6/3/d/0666f4654e1053041a17f67a9ad60.jpg",
-                "https://sta-reality2.1gr.cz/sta/compile/thumbs/9/0/5/4aeb7ad9791dacd738a53713b01c8.jpg",
-                "https://sta-reality2.1gr.cz/sta/compile/thumbs/c/b/6/4f5fe797906e2063df7c6610a0d09.jpg",
-                "https://sta-reality2.1gr.cz/sta/compile/thumbs/b/6/2/9a3fa44551b0db45736c35862a013.jpg",
-                "https://sta-reality2.1gr.cz/sta/compile/thumbs/c/9/c/2b0fe1db07e901e581fc122816724.jpg",
-                "https://sta-reality2.1gr.cz/sta/compile/thumbs/6/1/9/7eb4efb3f70e16208a6b40b6cb056.jpg",
-                "https://sta-reality2.1gr.cz/sta/compile/thumbs/6/f/1/6c68e3cddf77f7347a4757483f85d.jpg",
-                "https://sta-reality2.1gr.cz/sta/compile/thumbs/3/a/0/d7de3edd7692ffbae1c9afbd6bed0.jpg",
-                "https://sta-reality2.1gr.cz/sta/compile/thumbs/c/9/6/bde4c4133a2d4dc0a21c1fba6a8a4.jpg",
-                "https://sta-reality2.1gr.cz/sta/compile/thumbs/f/c/d/47b56024f33369cd12abbe42624c0.jpg",
-                "https://sta-reality2.1gr.cz/sta/compile/thumbs/b/e/8/da9373e54bddea4a0a8480a84af19.jpg",
-                "https://sta-reality2.1gr.cz/sta/compile/thumbs/3/6/5/19c513633b44a4169ead522dee3eb.jpg",
-                "https://sta-reality2.1gr.cz/sta/compile/thumbs/2/4/f/ec3a52d6b3dca55c35275b57f209e.jpg",
-                "https://sta-reality2.1gr.cz/sta/compile/thumbs/e/f/f/999a843a71f1739a6a7e3f9065912.jpg",
-                "https://sta-reality2.1gr.cz/sta/compile/thumbs/7/4/a/2726df6d86b8bd70be9efe4aa3084.jpg",
-                "https://sta-reality2.1gr.cz/sta/compile/thumbs/b/c/2/56423b0b594c24bd069e8e7864ada.jpg",
-                "https://sta-reality2.1gr.cz/sta/compile/thumbs/1/7/6/9cd2ed560c01885c85eb8ff5a9cd2.jpg",
-                "https://sta-reality2.1gr.cz/sta/compile/thumbs/c/8/8/1077062d2efae3ca10aff6c07d874.jpg"]},
-    {"id": 3, "description": "Prodej bytu 4+kk 88 m²", "price": "6 910 000 Kč",
-     "images": ["https://reality.idnes.cz/file/thumbnail/6611c046c365b853df0c66e1?profile=front_detail_article_big",
-                "https://reality.idnes.cz/file/thumbnail/6611c046c365b853df0c66e2?profile=front_detail_article_big",
-                "https://reality.idnes.cz/file/thumbnail/6611c046c365b853df0c66e3?profile=front_detail_article_big",
-                "https://reality.idnes.cz/file/thumbnail/6611c046c365b853df0c66e4?profile=front_detail_article_big",
-                "https://reality.idnes.cz/file/thumbnail/6611c046c365b853df0c66e5?profile=front_detail_article_big",
-                "https://reality.idnes.cz/file/thumbnail/6611c046c365b853df0c66e6?profile=front_detail_article_big",
-                "https://reality.idnes.cz/file/thumbnail/6611c046c365b853df0c66e7?profile=front_detail_article_big",
-                "https://reality.idnes.cz/file/thumbnail/6611c046c365b853df0c66e8?profile=front_detail_article_big",
-                "https://reality.idnes.cz/file/thumbnail/6611c046c365b853df0c66e9?profile=front_detail_article_big",
-                "https://reality.idnes.cz/file/thumbnail/6611c046c365b853df0c66ea?profile=front_detail_article_big",
-                "https://reality.idnes.cz/file/thumbnail/6611c046c365b853df0c66eb?profile=front_detail_article_big",
-                "https://reality.idnes.cz/file/thumbnail/6611c046c365b853df0c66ec?profile=front_detail_article_big"]},
-    {"id": 4, "description": "Prodej bytu 2+1 14 545 m²", "price": "1 630 000 Kč",
-     "images": ["https://sta-reality2.1gr.cz/sta/compile/thumbs/f/d/7/e566a184d3365927b332cdb1d9636.jpg",
-                "https://sta-reality2.1gr.cz/sta/compile/thumbs/6/3/c/349b5d24b483f5efda4cb48966f5a.jpg",
-                "https://reality.idnes.cz/file/thumbnail/6611b21785c073d4790e3d45?profile=front_detail_article_big",
-                "https://reality.idnes.cz/file/thumbnail/6611b21785c073d4790e3d46?profile=front_detail_article_big",
-                "https://reality.idnes.cz/file/thumbnail/6611b21785c073d4790e3d47?profile=front_detail_article_big",
-                "https://reality.idnes.cz/file/thumbnail/6611b21785c073d4790e3d48?profile=front_detail_article_big",
-                "https://reality.idnes.cz/file/thumbnail/6611b21785c073d4790e3d49?profile=front_detail_article_big"]},
-    {"id": 5, "description": "Prodej bytu 3+1 65 m²", "price": "5 280 000 Kč",
-     "images": ["https://sta-reality2.1gr.cz/sta/compile/thumbs/f/5/c/e05fb26696f648ee698e94e4ce966.jpg",
-                "https://sta-reality2.1gr.cz/sta/compile/thumbs/2/8/f/5394c68f7a304e10c206a24c1b06d.jpg",
-                "https://sta-reality2.1gr.cz/sta/compile/thumbs/7/b/0/a1a339e6089d073812eb0494503c4.jpg"]}
-]
+from urllib.parse import urlparse, parse_qs
 
 
-# Třída obsluhující HTTP požadavky
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
-
-    # Metoda pro zpracování GET požadavků
     def do_GET(self):
-        # Nastavíme hlavičku odpovědi
-        self.send_response(200)
-        self.send_header('Content-type', 'application/json')
-        self.end_headers()
-
-        # Pokud je požadavek na cestu '/', odešleme data
-        if self.path == '/':
-            self.wfile.write(json.dumps(data).encode())
-        # Jinak odešleme 404 chybu
+        if self.path == '/styles.css':  # Check if the requested path is for the CSS file
+            self.send_response(200)
+            self.send_header('Content-type', 'text/css')
+            self.end_headers()
+            with open('styles.css', 'rb') as f:
+                self.wfile.write(f.read())
         else:
-            self.send_error(404)
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html; charset=utf-8')
+            self.end_headers()
+
+        # Parse query parameters
+        query_components = parse_qs(urlparse(self.path).query)
+        page_number = int(query_components.get('page', ['1'])[0])
+        rows_per_page = 10
+        offset = (page_number - 1) * rows_per_page
+
+        # Connect to PostgreSQL database
+        conn = psycopg2.connect(
+            dbname="master",
+            user="postgres",
+            password="asdf",
+            host="localhost",
+            port="5432"
+        )
+        cursor = conn.cursor()
+
+        # Execute query to fetch data from the database
+        cursor.execute(f"SELECT * FROM idnes_reality LIMIT {rows_per_page} OFFSET {offset}")
+        rows = cursor.fetchall()
+
+        # Format fetched data into HTML table rows and cells
+        table_rows = ""
+        for row in rows:
+            table_rows += "<tr>"
+            table_rows += f"<td>{row[0]}</td>"  # id column
+            table_rows += f"<td>{row[1]}</td>"  # Titulek column
+            table_rows += f"<td>{row[2]}</td>"  # Cena column
+
+            # Náhled column with only one picture and buttons for navigation
+            image_urls = row[3][1:-1].split(",")  # Extract image URLs from string
+            first_image_url = image_urls[0].strip()
+            table_rows += f'<td><img id="image_{row[0]}" src="{first_image_url}">'
+            table_rows += f'<br><button onclick="prevImage({row[0]}, {image_urls})">Previous</button>'
+            table_rows += f'<button onclick="nextImage({row[0]}, {image_urls})">Next</button></td>'
+
+            table_rows += "</tr>"
+
+        # Count total number of rows in the database
+        cursor.execute("SELECT COUNT(*) FROM idnes_reality")
+        total_rows = cursor.fetchone()[0]
+
+        # Calculate total number of pages
+        total_pages = (total_rows + rows_per_page - 1) // rows_per_page
+
+        # Close database connection
+        cursor.close()
+        conn.close()
+
+        # HTML content
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Simple HTTP Server</title>
+            <link rel="stylesheet" type="text/css" href="styles.css">
+            <script>
+                function prevImage(id, images) {{
+                    var currentImage = document.getElementById('image_' + id);
+                    var currentIndex = images.indexOf(currentImage.src);
+                    if (currentIndex > 0) {{
+                        currentImage.src = images[currentIndex - 1];
+                    }}
+                }}
+
+                function nextImage(id, images) {{
+                    var currentImage = document.getElementById('image_' + id);
+                    var currentIndex = images.indexOf(currentImage.src);
+                    if (currentIndex < images.length - 1) {{
+                        currentImage.src = images[currentIndex + 1];
+                    }}
+                }}
+            </script>
+        </head>
+        <body>
+            <h1>Nabídky bytů v ČR</h1>
+
+            <p>Jednoduchý náhled poskytl Ladislav Moravec</p>
+            <table border="1">
+                <tr>
+                    <th>id</th>
+                    <th>Titulek</th>
+                    <th>Cena</th>
+                    <th>Náhled</th>
+                </tr>
+                {table_rows}
+            </table>
+
+            <div>
+                Page {page_number} of {total_pages}
+                <br>
+                {self.generate_pagination_links(page_number, total_pages)}
+            </div>
+        </body>
+        </html>
+        """
+        self.wfile.write(html_content.encode('utf-8'))
+
+    def generate_pagination_links(self, current_page, total_pages):
+        links = '<div class="pagination">'
+        if current_page > 1:
+            links += f'<a href="?page={current_page - 1}">Previous</a>'
+        start_page = max(1, current_page - 5)  # Show 5 pages before the current page
+        end_page = min(total_pages, start_page + 9)  # Show 10 pages in total
+        for page_num in range(start_page, end_page + 1):
+            if page_num == current_page:
+                links += f'<span class="current">{page_num}</span>'
+            else:
+                links += f'<a href="?page={page_num}">{page_num}</a>'
+        if current_page < total_pages:
+            links += f'<a href="?page={current_page + 1}">Next</a>'
+        links += '</div>'
+        return links
 
 
-# Funkce pro spuštění HTTP serveru
-def run(server_class=HTTPServer, handler_class=SimpleHTTPRequestHandler, port=8000):
+def run(server_class=HTTPServer, handler_class=SimpleHTTPRequestHandler, port=8080):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
-    print(f'Starting server on port {port}...')
+    print(f"Server running on port {port}")
     httpd.serve_forever()
 
 
-# Spustíme HTTP server na portu 8000
-run()
+if __name__ == "__main__":
+    run()
