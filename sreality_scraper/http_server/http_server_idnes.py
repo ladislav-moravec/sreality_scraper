@@ -130,7 +130,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         return links
 
 
-def run(server_class=HTTPServer, handler_class=SimpleHTTPRequestHandler, port=8080):
+def run(server_class=HTTPServer, handler_class=SimpleHTTPRequestHandler, port=8081):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
     print(f"Server running on port {port}")
