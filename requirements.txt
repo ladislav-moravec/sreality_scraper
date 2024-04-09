@@ -1,1 +1,5 @@
-ÿþ
+itemadapter==0.8.0
+psycopg2==2.9.9
+psycopg2_binary==2.9.9
+Requests==2.31.0
+Scrapy==2.11.1
