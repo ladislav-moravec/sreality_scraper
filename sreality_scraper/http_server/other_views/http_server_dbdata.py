@@ -79,7 +79,7 @@ def main():
     try:
         server_address = ('', 8080)
         httpd = HTTPServer(server_address, RequestHandler)
-        print('Starting server on port 8000...')
+        print('Starting server on port 8080...')
         httpd.serve_forever()
     except KeyboardInterrupt:
         print('^C received, shutting down the server')

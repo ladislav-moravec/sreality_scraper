@@ -1,6 +1,6 @@
-import psycopg2
-import json
 
+import json
+import psycopg2
 
 def put_to_db(table_name, title, price, image_urls):
 
