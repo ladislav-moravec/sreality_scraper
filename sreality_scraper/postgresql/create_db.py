@@ -2,7 +2,7 @@ import psycopg2
 
 def create_database():
     conn = psycopg2.connect(
-        dbname="postgres",
+        dbname="master",
         user="postgres",
         password="asdf",
         host="localhost"
@@ -41,7 +41,7 @@ def create_table(name_table):
 if __name__ == "__main__":
     try:
         create_database()
-        print("Databáze sreality byla úspěšně vytvořena.")
+        print("Databáze master byla úspěšně vytvořena.")
     except psycopg2.Error as e:
         print("Chyba při vytváření databáze:", e)
 
